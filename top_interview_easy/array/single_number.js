@@ -2,7 +2,7 @@
  * @param {number[]} nums
  * @return {number}
  */
-var singleNumber = function (nums) {
+let singleNumber = function (nums) {
   return nums.reduce((single, current) => {
     single ^= current;
 
