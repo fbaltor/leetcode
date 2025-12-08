@@ -1,24 +1,7 @@
-import { toArrayBuffer } from "jsr:@std/streams";
+import * as readline from "node:readline/promises";
+import { stdin as input } from "node:process";
 
 function removeDuplicates(nums: number[]): number {
-  const seen = new Map<number, number>();
-  let writeIndex = 0;
-
-  for (let readIndex = 0; readIndex < nums.length; readIndex++) {
-    const currentElement = nums[readIndex];
-    const currentCount = seen.get(currentElement) || 0;
-
-    if (currentCount < 2) {
-      nums[writeIndex] = currentElement;
-      seen.set(currentElement, currentCount + 1);
-      writeIndex++;
-    }
-  }
-
-  return writeIndex;
-}
-
-function removeDuplicates2(nums: number[]): number {
   if (nums.length <= 2) return nums.length;
   let k = 1;
   for (let i = 2; i < nums.length; i++) {
@@ -29,19 +12,12 @@ function removeDuplicates2(nums: number[]): number {
   return k + 1;
 }
 
-const input = new TextDecoder().decode(
-  await toArrayBuffer(Deno.stdin.readable),
-);
-const lines = input.trim().split("\n");
+const rl = readline.createInterface({ input, terminal: false });
 
-for (let i = 0; i < lines.length; i++) {
-  if (i < lines.length) {
-    // Parse the test case
-    const nums = JSON.parse(lines[i]);
+for await (const line of rl) {
+  const nums = JSON.parse(line);
 
-    // Call the merge function
-    const k = removeDuplicates2(nums);
+  const k = removeDuplicates(nums);
 
-    console.log(k, nums);
-  }
+  console.log(k, nums);
 }

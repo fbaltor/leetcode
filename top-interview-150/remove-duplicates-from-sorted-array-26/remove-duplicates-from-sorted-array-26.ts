@@ -1,4 +1,5 @@
-import { toArrayBuffer } from "jsr:@std/streams";
+import * as readline from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
 
 function removeDuplicates(nums: number[]): number {
   const unique = new Set<number>();
@@ -18,19 +19,13 @@ function removeDuplicates(nums: number[]): number {
   return left;
 }
 
-const input = new TextDecoder().decode(
-  await toArrayBuffer(Deno.stdin.readable),
-);
-const lines = input.trim().split("\n");
+const rl = readline.createInterface({ input, output, terminal: false });
 
-for (let i = 0; i < lines.length; i++) {
-  if (i < lines.length) {
-    // Parse the test case
-    const nums = JSON.parse(lines[i]);
+for await (const line of rl) {
+  const nums = JSON.parse(line);
 
-    // Call the merge function
-    const k = removeDuplicates(nums);
+  // Call the merge function
+  const k = removeDuplicates(nums);
 
-    console.log(k, nums);
-  }
+  console.log(k, nums);
 }
