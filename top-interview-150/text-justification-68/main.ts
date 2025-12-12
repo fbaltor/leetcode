@@ -24,36 +24,37 @@ while (true) {
 function makeLine(
   lineWords: string[],
   maxWidth: number,
+  isLastLine: boolean = false,
 ): string {
-  const totalChars = lineWords.reduce(
-    (sum, word) => sum + word.length,
-    0,
-  );
+  // Last line or single word: left-justify
+  if (isLastLine || lineWords.length === 1) {
+    const line = lineWords.join(" ");
+    return line + " ".repeat(maxWidth - line.length);
+  }
+
+  const totalChars = lineWords.reduce((sum, word) => sum + word.length, 0);
   const totalSpaces = maxWidth - totalChars;
   const gaps = lineWords.length - 1;
 
-  const finalSpace = totalSpaces % gaps;
-  const regularSpace = (totalSpaces - finalSpace) / (gaps - 1);
+  const spacesPerGap = Math.floor(totalSpaces / gaps);
+  const extraSpaces = totalSpaces % gaps;
 
-  return lineWords.reduce(
-    (line, word, index) => {
-      line += word;
-      if (index < lineWords.length - 1) {
-        line += " ".repeat(regularSpace);
+  return lineWords.reduce((line, word, index) => {
+    line += word;
+    if (index < lineWords.length - 1) {
+      // Add regular spaces to all gaps
+      line += " ".repeat(spacesPerGap);
+      // Add one extra space to the first 'extraSpaces' gaps
+      if (index < extraSpaces) {
+        line += " ";
       }
-
-      return line;
-    },
-    "",
-  );
+    }
+    return line;
+  }, "");
 }
 
-// console.log(makeLine(["abc", "d", "cc"], 9));
-
 function fullJustify(words: string[], maxWidth: number): string[] {
-  console.log(words);
   let i = 0;
-
   let justified = new Array<string>(0);
 
   while (i < words.length) {
@@ -61,21 +62,23 @@ function fullJustify(words: string[], maxWidth: number): string[] {
     let lineWords = new Array<string>(0);
     let minWidth = 0;
 
-    console.log(lineWords);
-    while (minWidth <= maxWidth && j < words.length) {
-      if (lineWords.length === 0) {
-        minWidth += words[j].length;
-      } else {
-        minWidth += words[j].length + 1;
-      }
+    while (j < words.length) {
+      const wordLen = words[j].length;
+      const neededWidth = lineWords.length === 0
+        ? wordLen
+        : minWidth + 1 + wordLen;
 
-      if (minWidth <= maxWidth) {
+      if (neededWidth <= maxWidth) {
         lineWords.push(words[j]);
+        minWidth = neededWidth;
         j++;
+      } else {
+        break;
       }
     }
 
-    justified.push(makeLine(lineWords, maxWidth));
+    const isLastLine = j === words.length;
+    justified.push(makeLine(lineWords, maxWidth, isLastLine));
     i = j;
   }
 
